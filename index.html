@@ -622,56 +622,115 @@
         </div>
     </footer>
 
-    <script>
-        // Function to show a random prediction
-        function loadRandomPrediction() {
-            const predictions = [
-                {
-                    title: "Stock market will reach new highs by year end",
-                    source: "Financial Times",
-                    expiry: "31/12/2023",
-                    category: "Economics",
-                    excerpt: "According to Financial Times analysts, the stock market is set to grow despite geopolitical uncertainties, with the FTSE MIB potentially reaching 28,500 points by the end of the year."
-                },
-                {
-                    title: "New vaccine will be ready by spring",
-                    source: "Nature Journal",
-                    expiry: "31/03/2023",
-                    category: "Science",
-                    excerpt: "Researchers predict they will complete testing phase of the new vaccine by the first months of 2023, with large-scale distribution expected by June."
-                },
-                {
-                    title: "Global temperature will increase by 1.5°C by 2025",
-                    source: "IPCC Report",
-                    expiry: "31/12/2025",
-                    category: "Environment",
-                    excerpt: "According to the IPCC report, global temperature is likely to exceed the 1.5°C threshold within the next 3 years compared to pre-industrial levels."
-                }
-            ];
-            
-            const randomPrediction = predictions[Math.floor(Math.random() * predictions.length)];
-            
-            document.querySelector('.random-prediction h3').textContent = randomPrediction.title;
-            document.querySelector('.random-prediction .source').textContent = `Source: ${randomPrediction.source}`;
-            document.querySelector('.random-prediction .date').textContent = `Due: ${randomPrediction.expiry}`;
-            document.querySelector('.random-prediction .tag:last-child').textContent = randomPrediction.category;
-            document.querySelector('.random-prediction p').textContent = randomPrediction.excerpt;
+   <script>
+    // Dati temporanei salvati nel browser
+    let predictions = JSON.parse(localStorage.getItem('wikiprev_predictions')) || [
+        {
+            id: 1,
+            title: "Stock market will reach new highs by year end",
+            source: "Financial Times", 
+            expiry: "2023-12-31",
+            category: "economics",
+            description: "According to Financial Times analysts, the stock market is set to grow despite geopolitical uncertainties.",
+            verified: false,
+            outcome: null
+        },
+        {
+            id: 2,
+            title: "New government within a week",
+            source: "Corriere della Sera",
+            expiry: "2023-11-15",
+            category: "politics",
+            description: "According to sources close to the negotiation, the government crisis will be resolved within 7 days.",
+            verified: false,
+            outcome: null
+        }
+    ];
+
+    // Salva i dati nel browser
+    function savePredictions() {
+        localStorage.setItem('wikiprev_predictions', JSON.stringify(predictions));
+    }
+
+    // Aggiungi una nuova previsione
+    function addPrediction(event) {
+        event.preventDefault();
+        
+        const newPrediction = {
+            id: Date.now(),
+            title: document.getElementById('title').value,
+            source: document.getElementById('source').value,
+            expiry: document.getElementById('expiry').value,
+            category: document.getElementById('category').value,
+            description: document.getElementById('description').value,
+            verified: false,
+            outcome: null
+        };
+
+        predictions.push(newPrediction);
+        savePredictions();
+        
+        alert('Prediction added successfully! Refresh the page to see it.');
+        document.getElementById('prediction-form').reset();
+    }
+
+    // Mostra le previsioni nella griglia
+    function renderPredictions() {
+        const container = document.querySelector('.predictions-grid');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        predictions.forEach(prediction => {
+            const card = `
+                <div class="prediction-card">
+                    <div class="card-content">
+                        <h3>${prediction.title}</h3>
+                        <p class="source">Source: ${prediction.source}</p>
+                        <div class="prediction-meta">
+                            <span class="tag"><i class="far fa-calendar"></i> Due: ${prediction.expiry}</span>
+                            <span class="tag ${prediction.category}"><i class="fas fa-tag"></i> ${prediction.category}</span>
+                        </div>
+                        <p>${prediction.description}</p>
+                        <a href="#" class="read-more">View details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += card;
+        });
+    }
+
+    // Previsione casuale
+    function loadRandomPrediction() {
+        if (predictions.length > 0) {
+            const randomPred = predictions[Math.floor(Math.random() * predictions.length)];
+            document.querySelector('.random-prediction h3').textContent = randomPred.title;
+            document.querySelector('.random-prediction p').textContent = randomPred.description;
+        }
+    }
+
+    // Setup iniziale
+    document.addEventListener('DOMContentLoaded', function() {
+        // Collegamento form
+        const form = document.getElementById('prediction-form');
+        if (form) {
+            form.addEventListener('submit', addPrediction);
         }
         
-        // Mobile menu handling
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.nav-links').classList.toggle('active');
-        });
+        // Carica dati
+        renderPredictions();
+        loadRandomPrediction();
         
-        // Form handling
-        document.getElementById('prediction-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your contribution! Your prediction has been submitted for review.');
-            this.reset();
-        });
+        // Mobile menu
+        const mobileBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
         
-        // Load a random prediction when the page loads
-        document.addEventListener('DOMContentLoaded', loadRandomPrediction);
-    </script>
+        if (mobileBtn && navLinks) {
+            mobileBtn.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        }
+    });
+</script>
 </body>
 </html>

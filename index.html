@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WikiPrev - Verifiable Forecast Archive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .random-prediction {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .random-prediction h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .prediction-meta {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background-color: var(--light-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .tag i {
+            margin-right: 5px;
+        }
+        
+        .tag.politics {
+            background-color: #ffeaa7;
+            color: #d35400;
+        }
+        
+        .tag.economics {
+            background-color: #d6eaf8;
+            color: #2980b9;
+        }
+        
+        .tag.technology {
+            background-color: #e8f8f5;
+            color: #16a085;
+        }
+        
+        .tag.sports {
+            background-color: #fbeee6;
+            color: #e67e22;
+        }
+        
+        .view-all {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+        
+        .view-all:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .filters {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2.5rem;
+        }
+        
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.2rem;
+        }
+        
+        .filter-form select, .filter-form input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .filter-form button {
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .filter-form button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .prediction-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .prediction-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .prediction-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prediction-card .source {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .prediction-card p {
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            margin-top: auto;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .read-more:hover {
+            color: var(--primary-color);
+        }
+        
+        .read-more i {
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .read-more:hover i {
+            transform: translateX(5px);
+        }
+        
+        .add-prediction {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            padding: 1rem 2rem;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+        
+        .footer-links li {
+            margin: 0 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--light-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .predictions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 1rem;
+                display: none;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 0.8rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-hourglass-half"></i>
+                <span>WikiPrev</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#">Archive</a></li>
+                <li><a href="#">Categories</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>WikiPrev - Verifiable Forecast Archive</h1>
+            <p>Track predictions, verify outcomes, and never forget to check what was promised</p>
+        </section>
+        
+        <div class="section-title">
+            <i class="fas fa-star"></i>
+            <h2>Featured Prediction</h2>
+        </div>
+        
+        <section class="random-prediction">
+            <div class="prediction-content">
+                <h3>Stock market will reach new highs by year end</h3>
+                <div class="prediction-meta">
+                    <span class="tag"><i class="far fa-calendar"></i> Due: 31/12/2023</span>
+                    <span class="tag economics"><i class="fas fa-chart-line"></i> Economics</span>
+                    <span class="tag"><i class="fas fa-source"></i> Financial Times</span>
+                </div>
+                <p>According to Financial Times analysts, the stock market is set to grow despite geopolitical uncertainties, with the FTSE MIB potentially reaching 28,500 points by the end of the year.</p>
+                <a href="#" class="view-all"><i class="fas fa-search"></i> View details and verify</a>
+            </div>
+        </section>
+
+        <div class="section-title">
+            <i class="fas fa-filter"></i>
+            <h2>Filter Predictions</h2>
+        </div>
+        
+        <section class="filters">
+            <form class="filter-form">
+                <select>
+                    <option value="">All categories</option>
+                    <option value="politics">Politics</option>
+                    <option value="economics">Economics</option>
+                    <option value="technology">Technology</option>
+                    <option value="sports">Sports</option>
+                    <option value="science">Science</option>
+                </select>
+                
+                <input type="date" placeholder="From date">
+                
+                <input type="date" placeholder="To date">
+                
+                <select>
+                    <option value="">Sort by</option>
+                    <option value="recent">Most recent</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="due-date">Due date</option>
+                </select>
+                
+                <button type="submit"><i class="fas fa-search"></i> Search Predictions</button>
+            </form>
+        </section>
+
+        <div class="section-title">
+            <i class="fas fa-archive"></i>
+            <h2>Recent Predictions</h2>
+        </div>
+        
+        <section class="predictions-grid">
+            <div class="prediction-card">
+                <div class="card-content">
+                    <h3>New government within a week</h3>
+                    <p class="source">Source: Corriere della Sera</p>
+                    <div class="prediction-meta">
+                        <span class="tag"><i class="far fa-calendar"></i> Due: 15/11/2023</span>
+                        <span class="tag politics"><i class="fas fa-landmark"></i> Politics</span>
+                    </div>
+                    <p>According to sources close to the negotiation, the government crisis will be resolved within 7 days with the formation of a national unity government.</p>
+                    <a href="#" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="prediction-card">
+                <div class="card-content">
+                    <h3>iPhone 15 will be revolutionary</h3>
+                    <p class="source">Source: TechCrunch</p>
+                    <div class="prediction-meta">
+                        <span class="tag"><i class="far fa-calendar"></i> Due: 30/09/2023</span>
+                        <span class="tag technology"><i class="fas fa-microchip"></i> Technology</span>
+                    </div>
+                    <p>Apple is preparing innovative features for the next iPhone that will change the smartphone market, including a bezel-less display.</p>
+                    <a href="#" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="prediction-card">
+                <div class="card-content">
+                    <h3>Juventus will win the championship</h3>
+                    <p class="source">Source: La Gazzetta dello Sport</p>
+                    <div class="prediction-meta">
+                        <span class="tag"><i class="far fa-calendar"></i> Due: 31/05/2023</span>
+                        <span class="tag sports"><i class="fas fa-running"></i> Sports</span>
+                    </div>
+                    <p>Despite a difficult start, the Turin team will recover and win the championship thanks to the return of some key injured players.</p>
+                    <a href="#" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-title">
+            <i class="fas fa-plus-circle"></i>
+            <h2>Add a Prediction</h2>
+        </div>
+        
+        <section class="add-prediction">
+            <form id="prediction-form">
+                <div class="form-group">
+                    <label for="title">Prediction Title</label>
+                    <input type="text" id="title" placeholder="Enter prediction title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="source">Source</label>
+                    <input type="text" id="source" placeholder="Enter source (newspaper, website, etc.)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="url">Source URL (optional)</label>
+                    <input type="url" id="url" placeholder="Enter link to original news">
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category">
+                        <option value="">Select a category</option>
+                        <option value="politics">Politics</option>
+                        <option value="economics">Economics</option>
+                        <option value="technology">Technology</option>
+                        <option value="sports">Sports</option>
+                        <option value="science">Science</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiry">Due Date for Verification</label>
+                    <input type="date" id="expiry">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Describe the prediction in detail"></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn"><i class="fas fa-plus"></i> Add Prediction</button>
+            </form>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>WikiPrev - Verifiable Forecast Archive</p>
+            <ul class="footer-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Archive</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <p>© 2023 WikiPrev - All rights reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // Function to show a random prediction
+        function loadRandomPrediction() {
+            const predictions = [
+                {
+                    title: "Stock market will reach new highs by year end",
+                    source: "Financial Times",
+                    expiry: "31/12/2023",
+                    category: "Economics",
+                    excerpt: "According to Financial Times analysts, the stock market is set to grow despite geopolitical uncertainties, with the FTSE MIB potentially reaching 28,500 points by the end of the year."
+                },
+                {
+                    title: "New vaccine will be ready by spring",
+                    source: "Nature Journal",
+                    expiry: "31/03/2023",
+                    category: "Science",
+                    excerpt: "Researchers predict they will complete testing phase of the new vaccine by the first months of 2023, with large-scale distribution expected by June."
+                },
+                {
+                    title: "Global temperature will increase by 1.5°C by 2025",
+                    source: "IPCC Report",
+                    expiry: "31/12/2025",
+                    category: "Environment",
+                    excerpt: "According to the IPCC report, global temperature is likely to exceed the 1.5°C threshold within the next 3 years compared to pre-industrial levels."
+                }
+            ];
+            
+            const randomPrediction = predictions[Math.floor(Math.random() * predictions.length)];
+            
+            document.querySelector('.random-prediction h3').textContent = randomPrediction.title;
+            document.querySelector('.random-prediction .source').textContent = `Source: ${randomPrediction.source}`;
+            document.querySelector('.random-prediction .date').textContent = `Due: ${randomPrediction.expiry}`;
+            document.querySelector('.random-prediction .tag:last-child').textContent = randomPrediction.category;
+            document.querySelector('.random-prediction p').textContent = randomPrediction.excerpt;
+        }
+        
+        // Mobile menu handling
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+        
+        // Form handling
+        document.getElementById('prediction-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your contribution! Your prediction has been submitted for review.');
+            this.reset();
+        });
+        
+        // Load a random prediction when the page loads
+        document.addEventListener('DOMContentLoaded', loadRandomPrediction);
+    </script>
+</body>
+</html>
